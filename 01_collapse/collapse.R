@@ -45,7 +45,7 @@ if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
 # Get file paths for most recent non-collapsed data
-feathers <- list.files(paste0(j, "LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash"), pattern=".feather$", ignore.case = T, full.names=T)
+feathers <- list.files(paste0(root, "LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash"), pattern=".feather$", ignore.case = T, full.names=T)
 pts <- grep(pattern="points", x=feathers, value = T)
 pts <- pts[length(pts)]
 polys <- grep(pattern="poly", x=feathers, value=T)
