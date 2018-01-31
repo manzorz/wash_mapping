@@ -42,6 +42,11 @@ polydat <- read_feather(polys)
 
 message("rbinding points and polys together")
 ptdat <- rbind(polydat, ptdat, fill=T) %>% data.table
+
+if (indicator == 'sani'){
+  ptdat <- rbind(ptdat, read_feather("/snfs1/LIMITED_USE/LU_GEOSPATIAL/collapsed/wash/IPUMS/feather/sani_polydat_dummy.feather"), fill=T) %>% as.data.table
+}
+
 #fix for broken UGA shp
 ptdat[shapefile == 'UGA_regions_2014_custom', shapefile := 'UGA_regions_custom']
 ptdat <- ptdat[iso3 != "TRUE"]
@@ -70,13 +75,13 @@ setnames(ptdat, "total_hh", "N")
 # ptdat_poly <- ptdat_poly[, N := sum(total_hh, na.rm=T), by=list(shapefile, location_code)]
 # ptdat_poly <- ptdat_poly[, total_hh := NULL]
 # ptdat_poly <- ptdat_poly[, point := 0]
-# 
+#
 # ptdat_points <- ptdat[!is.na(lat) & !is.na(long), ]
 # ptdat_points <- ptdat_points[, water := mean(water, na.rm=T), by=list(lat, long)]
 # ptdat_points <- ptdat_points[, N := sum(total_hh, na.rm=T), by=list(lat, long)]
 # ptdat_points <- ptdat_points[, total_hh := NULL]
 # ptdat_points <- ptdat_points[, point := 1]
-# 
+#
 # ptdat <- rbind(ptdat_poly, ptdat_points, fill=T)
 # names(ptdat)
 # "nid"           "iso3"          "lat"           "point"
@@ -113,7 +118,7 @@ setnames(ptdat, "total_hh", "N")
 #drop <- c("geospatial_id", "survey_name", "year_end", "survey_module", "strata", "psu", "hh_id", "w_source_drink", "t_type", "shared_san", "clusters_in_polygon", "hh_size")
 #IND_AHS_collapse <- IND_AHS_collapse[, (drop) := NULL]
 
-# temporarily generating random numbers as water score. This is a temporary fix. 
+# temporarily generating random numbers as water score. This is a temporary fix.
 #IND_AHS_collapse <- IND_AHS_collapse[, water := runif(nrow(IND_AHS_collapse))*3]
 # names(IND_AHS_collapse)
 # [1] "nid"           "iso3"          "point"         "shapefile"
@@ -179,7 +184,6 @@ source("/snfs2/HOME/gmanny/backups/Documents/Repos/lbd_core/mbg_central/polygon_
 message("start coverage function")
 regions <- c("africa", "south_asia", "se_asia", "latin_america", "middle_east")
 #regions <- rev(regions)
-regions <- "africa" #remove this whan Ani updates the collapse code to include more countries
 for (reg in regions){
   message(reg)
   coverage_maps <- try(graph_data_coverage_values(df = w_collapsed,
