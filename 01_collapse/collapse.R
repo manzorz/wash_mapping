@@ -5,7 +5,7 @@ rm(list = ls())
 # Define if you are running code loally
 local <- F
 
-# Set repo & library path 
+# Set repo & library path
 if(Sys.info()[1]!="Windows") {
   if(!local) {
     root <- "/home/j/"
@@ -33,7 +33,7 @@ detachAllPackages <- function() {
                       "package:base")
   package.list <- search()[ifelse(unlist(gregexpr("package:",search()))==1,TRUE,FALSE)]
   package.list <- setdiff(package.list,basic.packages)
-  if (length(package.list)>0)  for (package in package.list) 
+  if (length(package.list)>0)  for (package in package.list)
     detach(package, character.only=TRUE)
 }
 detachAllPackages()
@@ -44,6 +44,13 @@ new.packages <- packages[!(packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(packages, library, character.only = T)
 
+# Get file paths for most recent non-collapsed data
+feathers <- list.files(paste0(j, "LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash"), pattern=".feather$", ignore.case = T, full.names=T)
+pts <- grep(pattern="points", x=feathers, value = T)
+pts <- pts[length(pts)]
+polys <- grep(pattern="poly", x=feathers, value=T)
+polys <- polys[length(polys)]
+
 #### Load functions ####
 for (data_type in c("pt","poly")){
   message(paste("Loading",data_type, "data"))
@@ -51,17 +58,17 @@ for (data_type in c("pt","poly")){
   message('Loading Data...')
   # Load data
   if (!("pt_collapse" %in% ls()) & data_type == 'pt') {
-    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/points_2018_01_02.feather'))
+    pt_collapse <- read_feather(pts)
     Encoding(pt_collapse$w_source_drink) <- "UTF-8"
     Encoding(pt_collapse$w_source_other) <- "UTF-8"
     Encoding(pt_collapse$t_type) <- "UTF-8"
     pt_collapse$w_source_drink <- tolower(pt_collapse$w_source_drink)
     pt_collapse$w_source_other <- tolower(pt_collapse$w_source_other)
     pt_collapse$t_type <- tolower(pt_collapse$t_type)
-  } 
-    
+  }
+
   if (!("pt_collapse" %in% ls()) & data_type == 'poly') {
-    pt_collapse <- read_feather(paste0(root,'LIMITED_USE/LU_GEOSPATIAL/geo_matched/wash/poly_2018_01_02.feather'))
+    pt_collapse <- read_feather(polys)
     Encoding(pt_collapse$w_source_drink) <- "UTF-8"
     Encoding(pt_collapse$w_source_other) <- "UTF-8"
     Encoding(pt_collapse$t_type) <- "UTF-8"
@@ -83,7 +90,7 @@ for (data_type in c("pt","poly")){
           definitions <- select(definitions, string, sdg)
         } else {
           definitions <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_source_defined_2017_12_18.csv'),
-                                  encoding="windows-1252", stringsAsFactors = F) 
+                                  encoding="windows-1252", stringsAsFactors = F)
           definitions2 <- read.csv(paste0(root,'WORK/11_geospatial/wash/definitions/w_other_defined_2017_12_18.csv'),
                                    encoding="windows-1252", stringsAsFactors = F)
           definitions2 <- rename(definitions2, sdg2 = sdg)
@@ -100,7 +107,7 @@ for (data_type in c("pt","poly")){
         definitions$jmp <- ifelse(is.na(definitions$string), NA, definitions$jmp)
       }
       definitions <- distinct(definitions)
-      
+
       if (exists('definitions2')) {
         definitions2$string <- iconv(definitions2$string, 'windows-1252', 'UTF-8')
         definitions2$string <- tolower(definitions2$string)
@@ -130,7 +137,7 @@ for (data_type in c("pt","poly")){
 
       #### Address Missingness ####
       message("Addressing Missingness...")
-      
+
       # Remove clusters with more than 20% weighted missingness
       ptdat <- rm_miss()
 
@@ -153,7 +160,7 @@ for (data_type in c("pt","poly")){
       #### Aggregate Data ####
       # Bookmarking dataset so it can be looped over for conditional switch
       ptdat_preagg <- ptdat
-      
+
       # Conditional switch is to switch collapsing for conditional vs unconditional indicators
       for (conditional in c('unconditional')) {
         # Reseting the dataset to preagregate
@@ -169,11 +176,11 @@ for (data_type in c("pt","poly")){
 
         # create sdg improved for sdg era
         if(indi_fam == 'water') {ptdat$sdg_imp <- ptdat$piped + ptdat$imp}
-        
+
         #save poly and point collapses
         message("Saving Collapsed Data...")
         today <- gsub("-", "_", Sys.Date())
-          
+
         if (data_type == "poly") {
           polydat <- ptdat
           rm(ptdat)
