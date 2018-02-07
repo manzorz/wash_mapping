@@ -1,17 +1,24 @@
-initial_cleaning <- function(mydat = pt_collapse, var_family = indi_fam, dat_type = data_type) {
+initial_cleaning <- function(mydat = pt_collapse, var_family = indi_fam, dat_type = data_type,
+                             census = ipums) {
   
+  message('Subset to relevant variables')
   if (var_family == 'water') {
-    message('Subset to relevant variables')
     ptdat_0 <- dplyr::select(mydat, nid, iso3, lat, long, survey_series, hhweight, urban, 
-                             w_source_drink, w_source_other, hh_size, year_start,hhweight,
+                             w_source_drink, hh_size, year_start,hhweight,
                              shapefile,location_code)
   } 
 
   if (var_family == 'sani') {
-    ptdat_0 <- dplyr::select(mydat, nid, iso3, lat, long, survey_series, hhweight, urban, 
+    if (census) {
+      ptdat_0 <- dplyr::select(mydat, nid, iso3, lat, long, survey_series, hhweight, urban, 
+                             t_type, shared_san, hh_size, year_start,hhweight,
+                             shapefile,location_code,sewage)  
+    } else {
+      ptdat_0 <- dplyr::select(mydat, nid, iso3, lat, long, survey_series, hhweight, urban, 
                              t_type, shared_san, hh_size, year_start,hhweight,
                              shapefile,location_code)
 
+    }
   }
 
   if (var_family == 'hw') {

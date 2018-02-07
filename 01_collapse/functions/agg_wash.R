@@ -11,8 +11,10 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
     #  levels <- c('water_dist')
     #  mydat <- filter(mydat, piped == 1|imp == 1|well_imp == 1|spring_imp == 1)
     #} else {
-      levels <- c('piped', 'surface','imp','unimp','well_cw','well_imp','well_unimp',
-              'spring_cw','spring_imp','spring_unimp')
+      levels <- c('surface','imp','unimp',
+                  'piped', 'piped_imp', 'piped_cw', 
+                  'well_cw','well_imp','well_unimp',
+                  'spring_cw','spring_imp','spring_unimp')
     #}
   }
   
@@ -21,7 +23,9 @@ agg_indi <- function(mydat = ptdat, var_family = indi_fam, dt_type = data_type, 
       levels <- c('shared')
       mydat <- filter(mydat, imp == 1|latrine_imp == 1)
     } else {
-      levels <- c('imp', 'unimp','od','latrine_cw','latrine_imp','latrine_unimp')
+      levels <- c('imp', 'unimp','od',
+                  'latrine_cw','latrine_imp','latrine_unimp',
+                  'flush_imp','flush_unimp','flush_cw')
     }
     
   }
