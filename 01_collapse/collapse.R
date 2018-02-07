@@ -168,7 +168,7 @@ for (file_type in c('pt','poly','ipums')){
 
         rm(list = setdiff(ls(),c('definitions','pt_collapse','definitions2','indi_fam',
           'repo','data_type','root','agg_level', 'sdg', 'ipums', 'files', 'index', 'files_length',
-          'file_type', 'ipums_dir')))
+          'file_type', 'ipums_dir', 'pts', 'polys')))
 
         message("Importing functions...")
         setwd(repo)
